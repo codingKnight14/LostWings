@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="assets/logo2.png" />
+    <title>LostWings | There is no word like lost in our wordbook</title>
+  </head>
+  <body>
+    <div class="s">
+      <nav>
+        <div class="nav__logo">LostWings</div>
+        <ul class="nav__links">
+          <li class="link"><a href="#">Home</a></li>
+          <li class="link"><a href="../About/about.html">About</a></li>
+          <li class="link"><a id="findLink" href="Find.html">Find</a></li>
+          <li class="link"><a href="../Articles/articles1.html">Articles</a></li>
+          <li class="link"><a href="../Contact/contact.html">Contact</a></li>
+        </ul>
+        <div class="button" id="user-controls">
+          <button
+            class="btn"
+            id="login-btn"
+            onclick="location.href='login.html'"
+          >
+            LogIn
+          </button>
+          <button
+            class="btn"
+            id="signup-btn"
+            onclick="location.href='SignUp.html'" >
+            SignUp
+          </button>
+          <div id="user-info" style="display: none">
+            <span id="user-name"></span>
+            <button class="btn" id="logout-btn">LogOut</button>
+          </div>
+        </div>
+      </nav>
+      <header class="section__container header__container">
+        <h1 class="section__header">
+          Your loss is our loss<br />We know how does it feel!
+        </h1>
+        <!-- <img src="assets/bg1.jpg" alt="header" /> -->
+      </header>
+
+      <section class="section__container booking__container">
+        <div class="container">
+          <button class="uiverse" onclick="location.href='Find.html'">
+            <span class="tooltip">lets map your plane path</span>
+            <span>Locate</span>
+          </button>
+        </div>
+        
+      </section>
+    </div>
+
+    <section class="section__container plan__container">
+      <p class="subheader">RESCUE SUPPORT</p>
+      <h2 class="section__header">Our role in rescuing</h2>
+      <p class="description">
+        This is how we support or help the rescue team to find the lost aircraft
+        and save the valuable lives.
+      </p>
+      <div class="plan__grid">
+        <div class="plan__content">
+          <span class="number">01</span>
+          <h4>Accurate Location Tracking</h4>
+          <p>
+            We provide possible search areas precisely based on the last known
+            location, geographical coordinates, departure and arrival times, and
+            flight paths. This enables rescue teams to focus their efforts on
+            the most promising locations, significantly improving the chances of
+            a successful recovery.
+          </p>
+          <span class="number">02</span>
+          <h4>Real-Time Updates and Coordination</h4>
+          <p>
+            Our platform offers real-time updates and coordinates with rescue
+            teams to ensure they have the most current information. This helps
+            in adjusting search plans swiftly and accurately, enhancing the
+            efficiency of rescue operations.
+          </p>
+          <span class="number">03</span>
+          <h4>Advanced Mapping and Visualization Tools</h4>
+          <p>
+            Utilizing state-of-the-art mapping and visualization tools, we
+            create detailed maps of possible aircraft locations. These tools
+            allow rescue teams to visualize the search area clearly, making it
+            easier to plan and execute search and rescue missions effectively.
+          </p>
+        </div>
+        <div class="plan__image">
+          <img src="assets/plan-1.jpg" alt="plan" />
+          <img src="assets/plan-3.jpg" alt="plan" />
+          <img src="assets/plan-2.jpg" alt="plan" />
+        </div>
+      </div>
+    </section>
+
+    <!-------------- Opinion -------------->
+    <section class="section__container travellers__container">
+      <h2 class="section__header">What they say from their experience</h2>
+      <h4>They Survived because they were found!</h4>
+      <div class="travellers__grid">
+        <div class="travellers__card">
+          <img src="assets/virginia.jpg" alt="traveller" />
+          <div class="travellers__card__content">
+            <img src="assets/client-1.jpg" alt="client" />
+            <h4>Phil Bradley</h4>
+            <p>
+              "I don't know what happened, but I have no fear." Sole survivor in
+              the 1959 crash of Piedmont Airlines Flight 349 near Crozet,
+              Virginia.
+            </p>
+          </div>
+        </div>
+        <div class="travellers__card">
+          <img src="assets/BA.jpg" alt="traveller" />
+          <div class="travellers__card__content">
+            <img src="assets/client-2.jpg" alt="client" />
+            <h4>SFO John Coward</h4>
+            <p>
+              "As the final approach started I became aware that there was no
+              power ... suddenly there was nothing from any of the engines, and
+              the plane started to glide." British Airways flight 38 crash on 17
+              January 2008.
+            </p>
+          </div>
+        </div>
+        <div class="travellers__card">
+          <img src="assets/airindia.jpg" alt="traveller" />
+          <div class="travellers__card__content">
+            <img src="assets/client-4.jpg" alt="client" />
+            <h4>Ashiq Perumbal</h4>
+            <p>
+              "The Air India plane was out of control. We felt it breaking into
+              two. I thought I had lost my hands". One of the survivors of the
+              Air India plane crash On 7 August 2020, in Kozhikode, India.
+            </p>
+          </div>
+        </div>
+        <div class="travellers__card">
+          <img src="assets/Saurya.jpg" alt="traveller" />
+          <div class="travellers__card__content">
+            <img src="assets/client-3.jpg" alt="client" />
+            <h4>Manish Shakya</h4>
+            <p>
+              On 24 July 2024, a Bombardier CRJ200ER operated by Saurya Airlines
+              crashed shortly after take-off at Tribhuvan International Airport
+              in Kathmandu, Nepal. Manish Shakya was the sole survivor.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!---------------- <FOOTER> ---------------->
+    <footer class="footer">
+      <div class="section__container footer__container">
+        <div class="footer__col">
+          <h3>@LostWings</h3>
+          <p>
+            We are dedicated to aiding the search for lost aircraft. Our
+            platform assists in locating missing planes by gathering and
+            analyzing crucial information such as the last known location,
+            geographical coordinates, and times of departure and arrival.
+          </p>
+          <p>
+            For us, the safety of people is the utmost priority. Join us in our
+            mission to bring clarity and assistance to those affected by
+            aviation uncertainties.
+          </p>
+        </div>
+        <div class="footer__col">
+          <h4>GO TO</h4>
+          <p><a href="/LostWings/index.html">Home</a></p>
+          <p><a href="/About/about.html">About</a></p>
+          <p><a href="/Articles/articles1.html">Articles</a></p>
+          <p><a href="/Contact/contact.html">Contact</a></p>
+        </div>
+        <div class="footer__col">
+          <h4>CONTACT</h4>
+          <p>Support</p>
+          <p>Media</p>
+          <p>Socials</p>
+          <h4>ADDRESS</h4>
+          <div class="contact_link_box">
+            <a href="">
+              <i class="ri-map-pin-fill"></i>
+              <span> Bhubaneswar, Odisha, India </span><br />
+            </a>
+            <a href="">
+              <i class="ri-phone-fill"></i>
+              <span> +91 9861365799 </span><br />
+            </a>
+            <a href="">
+              <i class="ri-mail-fill"></i>
+              <span> lostwings@gmail.com </span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="section__container footer__bar">
+        <p>Copyright © 2024 LostWings. All rights reserved.</p>
+        <div class="socials">
+          <span
+            ><a href=""><i class="ri-facebook-fill"></i></a
+          ></span>
+          <span
+            ><a href=""><i class="ri-twitter-fill"></i></a
+          ></span>
+          <span
+            ><a href=""><i class="ri-instagram-fill"></i></a
+          ></span>
+          <span
+            ><a href=""><i class="ri-youtube-fill"></i></a
+          ></span>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      window.onload = async () => {
+        try {
+          const response = await fetch("/status", { credentials: "include" });
+          const data = await response.json();
+          const loginBtn = document.getElementById("login-btn");
+          const signupBtn = document.getElementById("signup-btn");
+          const userInfo = document.getElementById("user-info");
+          const userName = document.getElementById("user-name");
+          const logoutBtn = document.getElementById("logout-btn");
+          const findLink = document.getElementById("findLink");
+
+          if (data.loggedInUser) {
+            if (loginBtn) loginBtn.style.display = "none";
+            if (signupBtn) signupBtn.style.display = "none";
+            if (userInfo) userInfo.style.display = "flex";
+            if (userName) userName.textContent = `Welcome, ${data.userName}`;
+            if (logoutBtn) {
+              logoutBtn.addEventListener("click", async () => {
+                try {
+                  await fetch("/logout", {
+                    method: "POST",
+                    credentials: "include",
+                  });
+                  location.reload();
+                } catch (error) {
+                  console.error("Error logging out:", error);
+                }
+              });
+            }
+            if (findLink) {
+              findLink.style.pointerEvents = "auto";
+              findLink.style.color = "";
+            }
+          } else {
+            if (loginBtn) loginBtn.style.display = "block";
+            if (signupBtn) signupBtn.style.display = "block";
+            if (userInfo) userInfo.style.display = "none";
+            if (findLink) {
+              findLink.href = "#"; // Change href to a placeholder or leave it empty
+              findLink.style.pointerEvents = "none"; // Make it non-clickable
+              findLink.style.color = "gray"; // Optional: visually indicate it's disabled
+
+              findLink.addEventListener("click", (event) => {
+                event.preventDefault();
+                alert("You must be logged in to access this page.");
+                location.href = "login.html"; // Redirect to login page
+              });
+            }
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    </script>
+  </body>
+</html>

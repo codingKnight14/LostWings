@@ -1,0 +1,10 @@
+-- Active: 1723312154119@@127.0.0.1@3306@lostwings_db
+CREATE DATABASE lostwings_db;
+USE lostwings_db;
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

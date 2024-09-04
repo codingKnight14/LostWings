@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/logo2.png">
+  <title>Aircraft Finder | Calculate and find the nearby area of a plane</title>
+  <link rel="stylesheet" href="Find.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-curve/dist/leaflet-curve.css" />
+</head>
+  <body>
+    <div class="form-container">
+      <form id="travel-form">
+        <label for="aircraftType">Aircraft Type:</label>
+        <select id="aircraftType" name="aircraftType" class="input_field" onchange="populateModels()" required>
+          <option value="">Select Aircraft Type</option>
+          <option value="Commercial Airliner">Commercial Airliner</option>
+          <option value="Private Jet">Private Jet</option>
+          <option value="Military Aircraft">Military Aircraft</option>
+          <option value="General Aviation Aircraft">General Aviation Aircraft</option>
+          <option value="Cargo Aircraft">Cargo Aircraft</option>
+          <option value="Helicopters">Helicopters</option>
+        </select>
+
+        <label for="aircraftModel">Aircraft Model:</label>
+        <select id="aircraftModel" name="aircraftModel" class="input_field" required>
+          <option value="">Select Aircraft Model</option>
+        </select>
+        <label for="startAirport">Start Airport:</label>
+        <select id="startAirport" name="startAirport" class="input_field" onchange="updateLastContact()" required>
+          <option value="">Select Start Airport</option>
+        </select>
+
+        <label for="lastContactLatitude">Last Contact Latitude:</label>
+        <input type="number" step="0.0001" id="lastContactLatitude" name="lastContactLatitude" class="input_field"
+          required>
+        <label for="lastContactLongitude">Last Contact Longitude:</label>
+        <input type="number" step="0.0001" id="lastContactLongitude" name="lastContactLongitude" class="input_field"
+          required>
+        <label for="Speed">Speed</label>
+        <input type="number" step="0.0001" id="Speed" name="Speed" class="input_field" required>
+        <label for="Wind_Speed">Wind Speed</label>
+        <input type="number" step="0.0001" id="Wind_Speed" name="Wind_Speed" class="input_field" required>
+        <label for="Visiblity">Visiblity:</label>
+        <input type="number" step="0.0001" id="Visiblity" name="Visiblity" class="input_field" required>
+
+
+        <label for="destinationAirport">Destination Airport:</label>
+        <select id="destinationAirport" name="destinationAirport" class="input_field" required>
+          <option value="">Select Destination Airport</option>
+        </select>
+
+        <button type="button" class="submit-btn" onclick="calculateAndShow()">Calculate</button>
+      </form>
+    </div>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.curve/dist/leaflet.curve.min.js"></script>
+
+
+    <script>
+      const map = L.map('map').setView([51.5074, -0.1278], 5);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap'
+      }).addTo(map);
+
+      const aircrafts = [
+        {
+          type: "Commercial Airliner",
+          models: [
+            {
+              name: "Boeing 737",
+              fuelCapacity: 26000,
+              fuelEfficiency: 2.6,
+              maxSpeed: 876
+            },
+            {
+              name: "Airbus A320",
+              fuelCapacity: 24000, // liters
+              fuelEfficiency: 2.5, // liters per 100 km per passenger
+              maxSpeed: 871 // km/h
+            },
+            {
+              name: "Boeing 777",
+              fuelCapacity: 181280, // liters
+              fuelEfficiency: 3, // liters per 100 km per passenger
+              maxSpeed: 950 // km/h
+            },
+            {
+              name: "Airbus A380",
+              fuelCapacity: 320000, // liters
+              fuelEfficiency: 3.1, // liters per 100 km per passenger
+              maxSpeed: 1020 // km/h
+            },
+            {
+              name: "Boeing 787 Dreamliner",
+              fuelCapacity: 126917, // liters
+              fuelEfficiency: 2.7, // liters per 100 km per passenger
+              maxSpeed: 954 // km/h
+            },
+            {
+              name: "Airbus A350",
+              fuelCapacity: 141000, // liters
+              fuelEfficiency: 2.5, // liters per 100 km per passenger
+              maxSpeed: 945 // km/h
+            },
+            {
+              name: "Boeing 747",
+              fuelCapacity: 216840, // liters
+              fuelEfficiency: 3.3, // liters per 100 km per passenger
+              maxSpeed: 988 // km/h
+            },
+            {
+              name: "Embraer E190",
+              fuelCapacity: 13000, // liters
+              fuelEfficiency: 2.8, // liters per 100 km per passenger
+              maxSpeed: 870 // km/h
+            },
+            {
+              name: "Bombardier CRJ700",
+              fuelCapacity: 11340, // liters
+              fuelEfficiency: 3, // liters per 100 km per passenger
+              maxSpeed: 860 // km/h
+            }
+          ]
+        },
+        {
+          type: "Private Jet",
+          models: [
+            {
+              name: "Gulfstream G650",
+              fuelCapacity: 44492, // liters
+              fuelEfficiency: 0.68, // km per liter
+              maxSpeed: 982 // km/h
+            },
+            {
+              name: "Cessna Citation X",
+              fuelCapacity: 12500, // liters
+              fuelEfficiency: 0.56, // km per liter
+              maxSpeed: 972 // km/h
+            },
+            {
+              name: "Bombardier Global 7500",
+              fuelCapacity: 19850, // liters
+              fuelEfficiency: 0.55, // km per liter
+              maxSpeed: 982 // km/h
+            },
+            {
+              name: "Dassault Falcon 8X",
+              fuelCapacity: 17030, // liters
+              fuelEfficiency: 0.54, // km per liter
+              maxSpeed: 900 // km/h
+            },
+            {
+              name: "Embraer Phenom 300",
+              fuelCapacity: 5140, // liters
+              fuelEfficiency: 0.62, // km per liter
+              maxSpeed: 834 // km/h
+            },
+            {
+              name: "HondaJet",
+              fuelCapacity: 1600, // liters
+              fuelEfficiency: 0.72, // km per liter
+              maxSpeed: 782 // km/h
+            }
+          ]
+        },
+        {
+          type: "Military Aircraft",
+          models: [
+            {
+              name: "F-16 Fighting Falcon",
+              fuelCapacity: 3175, // liters internally, additional external tanks up to 7711 liters
+              fuelEfficiency: 0.24, // km per liter
+              maxSpeed: 2400 // km/h
+            },
+            {
+              name: "B-52 Stratofortress",
+              fuelCapacity: 181610, // liters
+              fuelEfficiency: 0.15, // km per liter
+              maxSpeed: 1047 // km/h
+            },
+            {
+              name: "Lockheed Martin F-35 Lightning II",
+              fuelCapacity: 8278, // liters
+              fuelEfficiency: 0.19, // km per liter
+              maxSpeed: 1931 // km/h
+            },
+            {
+              name: "Eurofighter Typhoon",
+              fuelCapacity: 5000, // liters internally
+              fuelEfficiency: 0.22, // km per liter
+              maxSpeed: 2495 // km/h
+            },
+            {
+              name: "F/A-18 Hornet",
+              fuelCapacity: 4900, // liters
+              fuelEfficiency: 0.21, // km per liter
+              maxSpeed: 1915 // km/h
+            },
+            {
+              name: "Mikoyan MiG-29",
+              fuelCapacity: 4300, // liters
+              fuelEfficiency: 0.20, // km per liter
+              maxSpeed: 2400 // km/h
+            }
+          ]
+        },
+        {
+          type: "General Aviation Aircraft",
+          models: [
+            {
+              name: "Cessna 172",
+              fuelCapacity: 212, // liters
+              fuelEfficiency: 12.4, // km per liter
+              maxSpeed: 226 // km/h
+            },
+            {
+              name: "Piper PA-28 Cherokee",
+              fuelCapacity: 189, // liters
+              fuelEfficiency: 11.9, // km per liter
+              maxSpeed: 235 // km/h
+            },
+            {
+              name: "Beechcraft Bonanza",
+              fuelCapacity: 454, // liters
+              fuelEfficiency: 9.35, // km per liter
+              maxSpeed: 333 // km/h
+            },
+            {
+              name: "Diamond DA40",
+              fuelCapacity: 151, // liters
+              fuelEfficiency: 14.3, // km per liter
+              maxSpeed: 285 // km/h
+            },
+            {
+              name: "Cirrus SR22",
+              fuelCapacity: 348, // liters
+              fuelEfficiency: 10.5, // km per liter
+              maxSpeed: 339 // km/h
+            },
+            {
+              name: "Mooney M20",
+              fuelCapacity: 265, // liters
+              fuelEfficiency: 11.8, // km per liter
+              maxSpeed: 379 // km/h
+            }
+          ]
+        },
+        {
+          type: "Cargo Aircraft",
+          models: [
+            {
+              name: "Boeing 747-8F",
+              fuelCapacity: 242470, // liters
+              fuelEfficiency: 0.16, // liters per ton-km
+              maxSpeed: 908 // km/h
+            },
+            {
+              name: "Antonov An-124",
+              fuelCapacity: 345000, // liters
+              fuelEfficiency: 0.20, // liters per ton-km
+              maxSpeed: 865 // km/h
+            },
+            {
+              name: "Lockheed C-130 Hercules",
+              fuelCapacity: 27300, // liters
+              fuelEfficiency: 0.17, // liters per ton-km
+              maxSpeed: 671 // km/h
+            },
+            {
+              name: "Airbus A330-200F",
+              fuelCapacity: 97000, // liters
+              fuelEfficiency: 0.18, // liters per ton-km
+              maxSpeed: 871 // km/h
+            },
+            {
+              name: "Boeing 767-300F",
+              fuelCapacity: 91400, // liters
+              fuelEfficiency: 0.17, // liters per ton-km
+              maxSpeed: 850 // km/h
+            },
+            {
+              name: "McDonnell Douglas MD-11F",
+              fuelCapacity: 147580, // liters
+              fuelEfficiency: 0.19, // liters per ton-km
+              maxSpeed: 945 // km/h
+            }
+          ]
+        },
+        {
+          type: "Helicopters",
+          models: [
+            {
+              name: "Bell 206",
+              fuelCapacity: 383,
+              fuelEfficiency: 1.2,
+              maxSpeed: 240
+            },
+            {
+              name: "Sikorsky UH-60 Black Hawk",
+              fuelCapacity: 1360, // liters
+              fuelEfficiency: 0.47,
+              maxSpeed: 294
+            },
+            {
+              name: "Robinson R44",
+              fuelCapacity: 190, // liters
+              fuelEfficiency: 1.0, // km per liter
+              maxSpeed: 240 // km/h
+            },
+            {
+              name: "Airbus H145",
+              fuelCapacity: 1100, // liters
+              fuelEfficiency: 0.9, // km per liter
+              maxSpeed: 270 // km/h
+            },
+            {
+              name: "AgustaWestland AW139",
+              fuelCapacity: 1280, // liters
+              fuelEfficiency: 0.85, // km per liter
+              maxSpeed: 310 // km/h
+            },
+            {
+              name: "Bell 407",
+              fuelCapacity: 508, // liters
+              fuelEfficiency: 1.1, // km per liter
+              maxSpeed: 246 // km/h
+            }
+          ]
+        }
+      ];
+      // Airpo
+      const airports = [
+        { name: "Hartsfield-Jackson Atlanta International Airport", coords: [33.6407, -84.4277] },
+        { name: "Beijing Capital International Airport", coords: [40.0801, 116.5846] },
+        { name: "Los Angeles International Airport", coords: [33.9416, -118.4085] },
+        { name: "Dubai International Airport", coords: [25.2532, 55.3657] },
+        { name: "Tokyo Haneda Airport", coords: [35.5494, 139.7798] },
+        { name: "O'Hare International Airport", coords: [41.9742, -87.9073] },
+        { name: "Heathrow Airport", coords: [51.4706, -0.4619] },
+        { name: "Hong Kong International Airport", coords: [22.3080, 113.9185] },
+        { name: "Shanghai Pudong International Airport", coords: [31.1443, 121.8083] },
+        { name: "Charles de Gaulle Airport", coords: [49.0097, 2.5479] },
+        { name: "Dallas/Fort Worth International Airport", coords: [32.8998, -97.0403] },
+        { name: "Guangzhou Baiyun International Airport", coords: [23.3925, 113.2988] },
+        { name: "Frankfurt Airport", coords: [50.0379, 8.5622] },
+        { name: "Istanbul Airport", coords: [41.2753, 28.7529] },
+        { name: "Singapore Changi Airport", coords: [1.3644, 103.9915] },
+        { name: "Incheon International Airport", coords: [37.4602, 126.4407] },
+        { name: "Suvarnabhumi Airport", coords: [13.6900, 100.7501] },
+        { name: "Denver International Airport", coords: [39.8561, -104.6737] },
+        { name: "Indira Gandhi International Airport", coords: [28.5562, 77.1000] },
+        { name: "John F. Kennedy International Airport", coords: [40.6413, -73.7781] },
+        { name: "San Francisco International Airport", coords: [37.6213, -122.3790] },
+        { name: "Chengdu Shuangliu International Airport", coords: [30.5723, 103.9460] },
+        { name: "Soekarno-Hatta International Airport", coords: [-6.1256, 106.6559] },
+        { name: "Leonardo da Vinci-Fiumicino Airport", coords: [41.7999, 12.2462] },
+        { name: "King Khalid International Airport", coords: [24.9576, 46.6988] },
+        { name: "Barcelona-El Prat Airport", coords: [41.2974, 2.0833] },
+        { name: "Toronto Pearson International Airport", coords: [43.6777, -79.6248] },
+        { name: "Miami International Airport", coords: [25.7959, -80.2871] },
+        { name: "Madrid-Barajas Adolfo Suárez Airport", coords: [40.4983, -3.5676] },
+        { name: "Sydney Kingsford Smith Airport", coords: [-33.9399, 151.1753] },
+        { name: "Vancouver International Airport", coords: [49.1947, -123.1792] },
+        { name: "Munich Airport", coords: [48.3538, 11.7861] },
+        { name: "Lisbon Portela Airport", coords: [38.7756, -9.1354] },
+        { name: "São Paulo-Guarulhos International Airport", coords: [-23.4356, -46.4731] },
+        { name: "Vienna International Airport", coords: [48.1103, 16.5697] },
+        { name: "Moscow Sheremetyevo International Airport", coords: [55.9726, 37.4146] },
+        { name: "Brisbane Airport", coords: [-27.3842, 153.1175] },
+        { name: "Zurich Airport", coords: [47.4647, 8.5491] },
+        { name: "Mexico City International Airport", coords: [19.4363, -99.0721] },
+        { name: "Santiago International Airport", coords: [-33.3930, -70.7858] },
+        { name: "Cape Town International Airport", coords: [-33.9648, 18.6017] },
+        { name: "Kuala Lumpur International Airport", coords: [2.7456, 101.7099] },
+        { name: "Buenos Aires Ezeiza Airport", coords: [-34.8222, -58.5358] },
+        { name: "Amsterdam Airport Schiphol", coords: [52.3105, 4.7683] },
+        { name: "Brussels Airport", coords: [50.9014, 4.4844] },
+        { name: "Berlin Brandenburg Airport", coords: [52.3667, 13.5033] },
+        { name: "Cairo International Airport", coords: [30.1219, 31.4056] },
+        { name: "Athens International Airport", coords: [37.9364, 23.9475] },
+        { name: "Rome Ciampino Airport", coords: [41.7998, 12.5949] },
+        { name: "Gatwick Airport", coords: [51.1537, -0.1821] },
+        { name: "Biju Patnaik International Airport", coords: [20.2565, 85.8178] },
+        { name: "Narita International Airport", coords: [35.7719, 140.3929] },
+        { name: "Seoul Gimpo International Airport", coords: [37.5583, 126.7906] },
+        { name: "Brussels South Charleroi Airport", coords: [50.4592, 4.4538] },
+        { name: "London Luton Airport", coords: [51.8747, -0.3683] },
+        { name: "Geneva Airport", coords: [46.2383, 6.1094] },
+        { name: "Nice Côte d'Azur Airport", coords: [43.6584, 7.2159] },
+        { name: "Copenhagen Airport", coords: [55.6180, 12.6560] },
+        { name: "Stockholm Arlanda Airport", coords: [59.6519, 17.9186] },
+        { name: "Oslo Gardermoen Airport", coords: [60.1942, 11.1004] },
+        { name: "Helsinki-Vantaa Airport", coords: [60.3172, 24.9633] },
+        { name: "Dublin Airport", coords: [53.4213, -6.2701] },
+        { name: "Manchester Airport", coords: [53.3650, -2.2729] },
+        { name: "Edinburgh Airport", coords: [55.9503, -3.3727] },
+        { name: "Birmingham Airport", coords: [52.4539, -1.7480] },
+        { name: "Glasgow Airport", coords: [55.8719, -4.4331] },
+        { name: "Hamad International Airport", coords: [25.2731, 51.6085] },
+        { name: "Abu Dhabi International Airport", coords: [24.4539, 54.3773] },
+        { name: "Jomo Kenyatta International Airport", coords: [-1.3192, 36.9275] },
+        { name: "Addis Ababa Bole International Airport", coords: [8.9779, 38.7993] },
+        { name: "Oliver Tambo International Airport", coords: [-26.1370, 28.2425] },
+        { name: "Cotonou Cadjehoun Airport", coords: [6.3572, 2.3844] },
+        { name: "Lagos Murtala Muhammed International Airport", coords: [6.5778, 3.3211] },
+        { name: "Accra Kotoka International Airport", coords: [5.6052, -0.1668] },
+        { name: "Luanda Quatro de Fevereiro Airport", coords: [-8.8584, 13.2310] },
+        { name: "Nairobi Wilson Airport", coords: [-1.3217, 36.8148] },
+        { name: "Kigali International Airport", coords: [-1.9686, 30.1395] },
+        { name: "Entebbe International Airport", coords: [0.0424, 32.4435] },
+        { name: "Harare International Airport", coords: [-17.9318, 31.0928] },
+        { name: "Dar es Salaam Julius Nyerere International Airport", coords: [-6.8781, 39.2026] },
+        { name: "Lusaka Kenneth Kaunda International Airport", coords: [-15.3290, 28.4526] },
+        { name: "Kilimanjaro International Airport", coords: [-3.4294, 37.0745] },
+        { name: "Maputo International Airport", coords: [-25.9208, 32.5732] },
+        { name: "Kisangani Bangoka International Airport", coords: [0.5175, 25.1553] },
+        { name: "Libreville Leon M'ba International Airport", coords: [0.4586, 9.4121] },
+        { name: "Douala International Airport", coords: [4.0061, 9.7194] },
+        { name: "Yaounde Nsimalen International Airport", coords: [3.7239, 11.5533] },
+        { name: "Abidjan Felix Houphouet-Boigny International Airport", coords: [5.2556, -3.9286] },
+        { name: "Banjul International Airport", coords: [13.3380, -16.6522] },
+        { name: "Bissau Osvaldo Vieira International Airport", coords: [11.8946, -15.6534] },
+        { name: "Freetown Lungi International Airport", coords: [8.6164, -13.1950] },
+        { name: "Monrovia Roberts International Airport", coords: [6.2408, -10.3623] },
+        { name: "Dakar Blaise Diagne International Airport", coords: [14.6711, -17.0733] },
+        { name: "Conakry Gbessia International Airport", coords: [9.5769, -13.6120] },
+        { name: "Ouagadougou International Airport", coords: [12.3533, -1.5124] },
+        { name: "Niamey Diori Hamani International Airport", coords: [13.4816, 2.1836] },
+        { name: "Bamako Senou International Airport", coords: [12.5335, -7.9499] },
+        { name: "N'Djamena Hassan Djamous International Airport", coords: [12.1337, 15.0344] },
+        { name: "Nouakchott-Oumtounsy International Airport", coords: [18.3105, -15.9691] },
+        { name: "Nouadhibou International Airport", coords: [20.9330, -17.0299] },
+        { name: "Djibouti-Ambouli International Airport", coords: [11.5473, 43.1594] },
+        { name: "Mogadishu Aden Adde International Airport", coords: [2.0147, 45.3055] },
+        { name: "Port Louis Sir Seewoosagur Ramgoolam International Airport", coords: [-20.4302, 57.6836] },
+        { name: "Antananarivo Ivato International Airport", coords: [-18.7969, 47.4788] },
+        { name: "Victoria Seychelles International Airport", coords: [-4.6743, 55.5218] },
+        { name: "Moroni Prince Said Ibrahim International Airport", coords: [-11.5334, 43.2717] },
+        { name: "Dzaoudzi Pamandzi International Airport", coords: [-12.8047, 45.2811] },
+        { name: "Saint-Denis Roland Garros Airport", coords: [-20.8871, 55.5103] },
+        { name: "Porto Novo Airport", coords: [0.9792, 6.6459] },
+        { name: "Lome-Tokoin Airport", coords: [6.1656, 1.2545] },
+        { name: "Port Harcourt International Airport", coords: [5.0155, 6.9496] },
+        { name: "Kano Mallam Aminu International Airport", coords: [12.0476, 8.5246] },
+        { name: "N'djamena International Airport", coords: [12.1337, 15.0344] },
+        { name: "Kigali International Airport", coords: [-1.9686, 30.1395] },
+        { name: "Malabo International Airport", coords: [3.7559, 8.7087] },
+        { name: "Sao Tome International Airport", coords: [0.3782, 6.7124] },
+        { name: "Bangui M'Poko International Airport", coords: [4.3985, 18.5188] },
+        { name: "Brazzaville Maya-Maya Airport", coords: [-4.2517, 15.2531] },
+        { name: "Kinshasa N'Djili International Airport", coords: [-4.3858, 15.4445] },
+        { name: "Pointe Noire Airport", coords: [-4.8146, 11.8866] },
+        { name: "Gabon Libreville Leon M'ba International Airport", coords: [0.4586, 9.4121] },
+        { name: "Banjul Yundum International Airport", coords: [13.3380, -16.6522] },
+        { name: "Ouagadougou International Airport", coords: [12.3533, -1.5124] },
+        { name: "Niamey Diori Hamani International Airport", coords: [13.4816, 2.1836] },
+        { name: "Bamako Senou International Airport", coords: [12.5335, -7.9499] },
+        { name: "N'Djamena Hassan Djamous International Airport", coords: [12.1337, 15.0344] },
+        { name: "Nouakchott-Oumtounsy International Airport", coords: [18.3105, -15.9691] },
+        { name: "Antananarivo Ivato International Airport", coords: [-18.7969, 47.4788] },
+        { name: "Brazzaville Maya-Maya Airport", coords: [-4.2517, 15.2531] },
+        { name: "Kinshasa N'Djili International Airport", coords: [-4.3858, 15.4445] },
+        { name: "Djibouti-Ambouli International Airport", coords: [11.5473, 43.1594] },
+        { name: "Mogadishu Aden Adde International Airport", coords: [2.0147, 45.3055] },
+        { name: "Porto Novo Airport", coords: [0.9792, 6.6459] },
+        { name: "Lome-Tokoin Airport", coords: [6.1656, 1.2545] },
+        { name: "Libreville Leon M'ba International Airport", coords: [0.4586, 9.4121] }
+      ];
+
+      // Populate models based on selected aircraft type
+      function populateModels() {
+        const type = document.getElementById('aircraftType').value;
+        const modelSelect = document.getElementById('aircraftModel');
+        modelSelect.innerHTML = '<option value="">Select Aircraft Model</option>'; // Clear previous options
+
+        if (type) {
+          const aircraftType = aircrafts.find(a => a.type === type);
+          if (aircraftType) {
+            aircraftType.models.forEach(model => {
+              const option = document.createElement('option');
+              option.value = model.name;
+              option.textContent = model.name;
+              modelSelect.appendChild(option);
+            });
+          }
+        }
+      }
+
+      // Populate destination and start airports
+      function populateAirports() {
+        const startAirportSelect = document.getElementById('startAirport');
+        const destinationAirportSelect = document.getElementById('destinationAirport');
+        startAirportSelect.innerHTML = '<option value="">Select Start Airport</option>'; // Clear previous options
+        destinationAirportSelect.innerHTML = '<option value="">Select Destination Airport</option>'; // Clear previous options
+
+        airports.forEach(airport => {
+          const startOption = document.createElement('option');
+          startOption.value = airport.name;
+          startOption.textContent = airport.name;
+          startAirportSelect.appendChild(startOption);
+
+          const destOption = document.createElement('option');
+          destOption.value = airport.name;
+          destOption.textContent = airport.name;
+          destinationAirportSelect.appendChild(destOption);
+        });
+      }
+
+      const customIcon = L.icon({
+        iconUrl: 'assets/icons8-airport-48.png', // Update this with the correct path to your downloaded icon
+        iconSize: [25, 25], // Update the size according to your icon's dimensions
+        iconAnchor: [12, 25], // Update the anchor point as needed
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      });
+
+      // Function to add airport markers with custom icon
+      function addAirportMarkers() {
+        airports.forEach(airport => {
+          L.marker(airport.coords, { icon: customIcon })
+            .addTo(map)
+            .bindPopup(`<b>${airport.name}</b>`)
+            .openPopup();
+        });
+      }
+      function updateLastContact() {
+  const startAirportName = document.getElementById('startAirport').value;
+  const startAirport = airports.find(a => a.name === startAirportName);
+  if (startAirport) {
+    document.getElementById('lastContactLatitude').value = startAirport.coords[0];
+    document.getElementById('lastContactLongitude').value = startAirport.coords[1];
+  }
+}
+
+function calculateTravelDistance(fuelCapacity, fuelEfficiency) {
+  return fuelCapacity * fuelEfficiency;
+}
+
+function haversineDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function findNearestPoint(userLat, userLon, points) {
+  let nearestPoint = null;
+  let shortestDistance = Infinity;
+
+  points.forEach(point => {
+    const [pointLat, pointLon] = point.coords;
+    const distance = haversineDistance(userLat, userLon, pointLat, pointLon);
+
+    if (distance < shortestDistance) {
+      shortestDistance = distance;
+      nearestPoint = point;
+    }
+  });
+
+  return nearestPoint;
+}
+
+function calculateFuelConsumed(distance, fuelEfficiency) {
+  return distance * fuelEfficiency;
+}
+
+function calculateFuelLeft(initialFuel, fuelConsumed) {
+  return Math.max(initialFuel - fuelConsumed, 0);
+}
+
+function calculateMaxDistance(speed, windSpeed, visibility, remainingFuel) {
+  const speedFactor = 1.0;
+  const windSpeedFactor = 0.5;
+  const visibilityFactor = 0.2;
+  return Math.max(speed * speedFactor - windSpeed * windSpeedFactor + visibility * visibilityFactor + remainingFuel, 0);
+}
+
+function calculateAndShow() {
+  const type = document.getElementById('aircraftType').value;
+  const modelName = document.getElementById('aircraftModel').value;
+  const startAirportName = document.getElementById('startAirport').value;
+  const lastContactLatitude = parseFloat(document.getElementById('lastContactLatitude').value);
+  const lastContactLongitude = parseFloat(document.getElementById('lastContactLongitude').value);
+  const destinationAirportName = document.getElementById('destinationAirport').value;
+
+  if (!type || !modelName || !startAirportName || isNaN(lastContactLatitude) || isNaN(lastContactLongitude) || !destinationAirportName) {
+    alert('Please complete all required fields.');
+    return;
+  }
+
+  const aircraftType = aircrafts.find(a => a.type === type);
+  const model = aircraftType.models.find(m => m.name === modelName);
+  if (!model) {
+    alert('Selected aircraft model not found.');
+    return;
+  }
+
+  const startAirport = airports.find(a => a.name === startAirportName);
+  if (!startAirport) {
+    alert('Selected starting airport not found.');
+    return;
+  }
+
+  const destinationAirport = airports.find(a => a.name === destinationAirportName);
+  if (!destinationAirport) {
+    alert('Selected destination airport not found.');
+    return;
+  }
+
+  map.eachLayer((layer) => {
+    if (layer instanceof L.Marker || layer instanceof L.Polyline || layer instanceof L.Circle) {
+      map.removeLayer(layer);
+    }
+  });
+
+  // Add the base map tile layer
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 15,
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+
+  // Add markers
+  const startMarker = L.marker(startAirport.coords, { icon: customIcon }).addTo(map)
+    .bindPopup(`<b>${startAirport.name}</b>`)
+    .openPopup();
+
+  const lastContactMarker = L.marker([lastContactLatitude, lastContactLongitude], { icon: customIcon }).addTo(map)
+    .bindPopup('Last Contact Location')
+    .openPopup();
+
+  const destinationMarker = L.marker(destinationAirport.coords, { icon: customIcon }).addTo(map)
+    .bindPopup(`<b>${destinationAirport.name}</b>`)
+    .openPopup();
+
+  // Find the nearest airport
+  const nearestAirport = findNearestPoint(lastContactLatitude, lastContactLongitude, airports);
+  const nearestAirportMarker = L.marker(nearestAirport.coords, { icon: customIcon }).addTo(map)
+    .bindPopup(nearestAirport.name)
+    .openPopup();
+
+  // Draw routes
+  const routeToLastContact = L.polyline([startAirport.coords, [lastContactLatitude, lastContactLongitude]], { color: 'red' }).addTo(map);
+  const routeToDestination = L.polyline([startAirport.coords, destinationAirport.coords], { color: 'blue' }).addTo(map);
+  const routeToNearestAirport = L.polyline([[lastContactLatitude, lastContactLongitude], nearestAirport.coords], { color: 'green' }).addTo(map);
+
+  // Calculate fuel and distance
+  const distanceCovered = haversineDistance(startAirport.coords[0], startAirport.coords[1], lastContactLatitude, lastContactLongitude);
+  const fuelConsumed = calculateFuelConsumed(distanceCovered, model.fuelEfficiency);
+  const fuelLeft = calculateFuelLeft(model.fuelCapacity, fuelConsumed);
+  const maxDistance = calculateMaxDistance(parseFloat(document.getElementById("Speed").value), parseFloat(document.getElementById("Wind_Speed").value), parseFloat(document.getElementById("Visiblity").value), fuelLeft);
+
+  const circle = L.circle([lastContactLatitude, lastContactLongitude], {
+    radius: maxDistance*2, 
+    color: 'red',
+    fillColor: '#0f0',
+    fillOpacity: 0.5
+  }).addTo(map);
+
+  // Fit map to bounds
+  map.fitBounds([
+    routeToLastContact.getBounds(),
+    routeToDestination.getBounds(),
+    circle.getBounds()
+  ]);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  populateAirports();
+  addAirportMarkers();
+});
+ </script>
+
+  </body>
+
+</html>
